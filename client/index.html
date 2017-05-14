@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+
+<body>
+    <!-- форма для отправки сообщений -->
+    <form name="publish">
+        <input type="text" name="message">
+        <input type="submit" value="Отправить">
+    </form>
+    <!-- здесь будут появляться входящие сообщения -->
+    <div id="subscribe"></div>
+    <script>
+    // создать подключение
+    var socket = new WebSocket("ws://localhost:8081");
+
+    // отправить сообщение из формы publish
+    document.forms.publish.onsubmit = function() {
+        var message = this.message.value;
+
+        socket.send(JSON.stringify({
+            message: message
+        }));
+        return false;
+    };
+
+    // обработчик входящих сообщений
+    socket.onmessage = function(event) {
+        var incomingMessage = JSON.parse(event.data);
+        showMessage(incomingMessage);
+    };
+
+    // показать сообщение в div#subscribe
+    function showMessage(message) {
+        var messageElem = document.createElement('div');
+        messageElem.appendChild(document.createTextNode(message.id + " : " + message.message));
+        document.getElementById('subscribe').appendChild(messageElem);
+    }
+    </script>
+</body>
+
+</html>

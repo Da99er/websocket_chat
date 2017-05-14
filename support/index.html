@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+
+<body>
+    <!-- 
+    <form name="publish">
+        <input type="text" name="message">
+        <input type="submit" value="Отправить">
+    </form>
+     
+    <div id="subscribe"></div>-->
+    <script>
+    // создать подключение
+    var socket = new WebSocket("ws://localhost:8081", "support1211&&2wEEE#we$r%asd");
+
+    // отправить сообщение из формы publish
+    /*document.forms.publish.onsubmit = function() {
+        var outgoingMessage = this.message.value;
+
+        socket.send(outgoingMessage);
+        return false;
+    };*/
+
+    function _creat_chat_template(msg) {
+        var chat_form = document.createElement("form");
+        chat_form.name = msg.id;
+        var chat_input_message = document.createElement("input");
+        chat_input_message.name = "message";
+        chat_input_message.type = "text";
+        var chat_send_message = document.createElement("input");
+        chat_send_message.value = "send";
+        chat_send_message.type = "submit";
+        var chat_conersation = document.createElement("div");
+        chat_conersation.id = msg.id;
+        chat_form.appendChild(chat_conersation);
+        chat_form.appendChild(chat_input_message);
+        chat_form.appendChild(chat_send_message);
+        document.body.appendChild(chat_form);
+
+        _add_msg(msg);
+        chat_form.onsubmit = function() {
+            var message = this.message.value;
+            var id = this.name;
+            message && socket.send(JSON.stringify({
+                message: message,
+                id: id
+            }));
+            return false;
+        };
+    }
+
+    // обработчик входящих сообщений
+    socket.onmessage = function(event) {
+        var msg = JSON.parse(event.data);
+        console.log('@>111', msg, msg.id);
+        console.log('@>111', document.getElementById(msg.id));
+
+        if (document.getElementById(msg.id)) {
+            _add_msg(msg);
+        } else {
+            _creat_chat_template(msg);
+        }
+
+        if (msg && msg.message === "/close" && document.getElementsByName(msg.id)[0]) {
+            console.log('@>del')
+            document.getElementsByName(msg.id)[0].remove();
+        }
+    };
+
+    // показать сообщение в div#subscribe
+    function _add_msg(msg) {
+        var messageElem = document.createElement('div');
+        messageElem.appendChild(document.createTextNode(msg.id + " : " + msg.message));
+        document.getElementById(msg.id).appendChild(messageElem);
+    }
+    </script>
+</body>
+
+</html>
