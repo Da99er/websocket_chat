@@ -7,25 +7,9 @@
 </head>
 
 <body>
-    <!-- 
-    <form name="publish">
-        <input type="text" name="message">
-        <input type="submit" value="Отправить">
-    </form>
-     
-    <div id="subscribe"></div>-->
     <script>
-    // создать подключение
-    var socket = new WebSocket("ws://localhost:8081", "support1211&&2wEEE#we$r%asd");
-
-    // отправить сообщение из формы publish
-    /*document.forms.publish.onsubmit = function() {
-        var outgoingMessage = this.message.value;
-
-        socket.send(outgoingMessage);
-        return false;
-    };*/
-
+    var socket = new WebSocket("ws://localhost:8081", "test123");
+    
     function _creat_chat_template(msg) {
         var chat_form = document.createElement("form");
         chat_form.name = msg.id;

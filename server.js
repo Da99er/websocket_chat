@@ -1,4 +1,6 @@
-let static = require('node-static');
+const path = require("path");
+const static = require('node-static');
+
 
 let file = new static.Server('./');
 
@@ -13,10 +15,10 @@ let WebSocketServer = new require('ws');
 let clients = {}; // all web socket clients
 
 var webSocketServer = new WebSocketServer.Server({
-    port: 8081
+    port: 8081 || process.argv[3]
 }, console.log('@>peer chat was running on ' + (8085 || process.argv[2])));
 
-let ADMIN_ID = "support1211&&2wEEE#we$r%asd";
+let { ADMIN_ID } = require(path.join(__dirname, "cfg"));
 
 webSocketServer.on('connection', function(ws) {
 
