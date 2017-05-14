@@ -9,7 +9,7 @@
 <body>
     <script>
     var socket = new WebSocket("ws://localhost:8081", "test123");
-    
+
     function _creat_chat_template(msg) {
         var chat_form = document.createElement("form");
         chat_form.name = msg.id;
@@ -41,7 +41,7 @@
     // обработчик входящих сообщений
     socket.onmessage = function(event) {
         var msg = JSON.parse(event.data);
-        console.log('@>111', msg, msg.id);
+        console.log('@>111', msg);
         console.log('@>111', document.getElementById(msg.id));
 
         if (document.getElementById(msg.id)) {
@@ -59,7 +59,8 @@
     // показать сообщение в div#subscribe
     function _add_msg(msg) {
         var messageElem = document.createElement('div');
-        messageElem.appendChild(document.createTextNode(msg.id + " : " + msg.message));
+        let message_text = (msg.is_admin ? "you" : msg.id) + " : " + msg.message;
+        messageElem.appendChild(document.createTextNode(message_text));
         document.getElementById(msg.id).appendChild(messageElem);
     }
     </script>

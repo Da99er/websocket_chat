@@ -2,7 +2,7 @@ const path = require("path");
 const static = require('node-static');
 
 
-let file = new static.Server('./');
+let file = new static.Server(__dirname);
 
 let server = require('http').createServer(function(request, response) {
     request.addListener('end', function() {
@@ -57,14 +57,15 @@ webSocketServer.on('connection', function(ws) {
         let client = clients[msg.id || id];
 
         client && client.send(JSON.stringify({
-            id,
+            id: msg.id ? "support" : id,
             message: msg.message
         }));
 
 
         clients["support"] && clients["support"].send(JSON.stringify({
             id: msg.id || id,
-            message: msg.message
+            message: msg.message,
+            is_admin: msg.id
         }));
 
 

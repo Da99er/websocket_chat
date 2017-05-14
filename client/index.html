@@ -37,7 +37,8 @@
     // показать сообщение в div#subscribe
     function showMessage(message) {
         var messageElem = document.createElement('div');
-        messageElem.appendChild(document.createTextNode(message.id + " : " + message.message));
+        let author = message.id !== "support" ? "you" : "support";
+        messageElem.appendChild(document.createTextNode(author + " : " + message.message));
         document.getElementById('subscribe').appendChild(messageElem);
     }
     </script>
