@@ -4,7 +4,7 @@ const static = require('node-static');
 
 let file = new static.Server(__dirname);
 
-let PORT_SOCKET = 8087 || process.argv[2];
+let PORT_SOCKET = process.argv[2];
 let PORT_STATIC = process.argv[3];
 
 if (PORT_STATIC) {

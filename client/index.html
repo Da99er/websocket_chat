@@ -6,7 +6,7 @@
     <title>Client</title>
 </head>
 
-<body>
+<body style="background: linear-gradient(to bottom, #f0f9ff 0%,#cbebff 47%,#a1dbff 100%)">
     <form name="chart_form" class="chart_form">
         <button id="switch_chat" class="switch_chat_button">Support</button>
         <div id="chat_subscribe" class="chat_subscribe">
@@ -56,6 +56,7 @@
     </script>
     <style>
     .chart_form {
+        box-sizing: initial;
         background: inherit;
         font-family: Arial, sans-serif;
         transition: 0.2s ease-in;
@@ -67,7 +68,7 @@
     }
     
     .chart_form.active_chart {
-        height: 306px;
+        height: 332px;
     }
     
     .switch_chat_button {
@@ -75,7 +76,7 @@
         width: 100%;
         border: 0;
         font-size: 19px;
-        padding: 10px;
+        padding: 10px 0;
         cursor: pointer;
         color: #fff;
     }
@@ -89,14 +90,16 @@
     }
     
     .chat_message {
-        padding: 10px;
+        padding: 2%;
         border: 0;
         margin: 0;
         border-radius: initial !important;
         resize: none;
-        height: 30px;
         overflow-y: auto;
         font-size: 14px;
+        display: block;
+        width: 96%;
+        min-height: 40px;
     }
     
     .chat_message:hover,
@@ -108,11 +111,12 @@
         width: 100%;
         border: 0;
         display: block;
-        padding: 8px;
+        padding: 8px 0;
         font-size: 19px;
         background-color: #2196f3;
         border-radius: 0 !important;
         color: #fff;
+        cursor: pointer;
     }
     </style>
 </body>
