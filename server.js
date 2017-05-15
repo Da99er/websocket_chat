@@ -19,7 +19,7 @@ let clients = {}; // all web socket clients
 
 var webSocketServer = new WebSocketServer.Server({
     port: PORT_SOCKET
-}, console.log('@>peer chat was running on ' + PORT_STATIC));
+}, console.log('@>peer chat was running on ' + PORT_STATIC +'socket on: ' + PORT_SOCKET));
 
 let { ADMIN_ID } = require(path.join(__dirname, "cfg"));
 
