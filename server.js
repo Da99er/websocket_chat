@@ -4,19 +4,22 @@ const static = require('node-static');
 
 let file = new static.Server(__dirname);
 
+let PORT_STATIC = 8085 || process.argv[2];
+let PORT_SOCKET = 8087 || process.argv[3];
+
 let server = require('http').createServer(function(request, response) {
     request.addListener('end', function() {
         file.serve(request, response);
     }).resume();
-}).listen(8085 || process.argv[2]);
+}).listen(PORT_STATIC);
 
 let WebSocketServer = new require('ws');
 
 let clients = {}; // all web socket clients
 
 var webSocketServer = new WebSocketServer.Server({
-    port: 8081 || process.argv[3]
-}, console.log('@>peer chat was running on ' + (8085 || process.argv[2])));
+    port: PORT_SOCKET
+}, console.log('@>peer chat was running on ' + PORT_STATIC));
 
 let { ADMIN_ID } = require(path.join(__dirname, "cfg"));
 

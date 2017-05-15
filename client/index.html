@@ -22,7 +22,7 @@
         var form = document.getElementById("switch_chat").parentNode;
         if (form.className === "chart_form") {
             form.className = "chart_form active_chart"
-            chat_socket = new WebSocket("ws://127.0.0.1:8081");
+            chat_socket = new WebSocket("ws://127.0.0.1:8087");
 
             chat_socket.onmessage = function(event) {
                 var incomingMessage = JSON.parse(event.data);
@@ -32,7 +32,6 @@
             form.className = "chart_form";
             chat_socket && chat_socket.close();
         }
-        console.log('@>switch_chat', form)
     });
 
 
