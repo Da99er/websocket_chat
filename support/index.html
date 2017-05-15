@@ -8,14 +8,13 @@
 
 <body>
     <script>
-    var socket = new WebSocket("ws://localhost:8081", "test123");
+    var chat_socket = new WebSocket("ws://127.0.0.1:8081", "test123");
 
     function _creat_chat_template(msg) {
         var chat_form = document.createElement("form");
         chat_form.name = msg.id;
-        var chat_input_message = document.createElement("input");
-        chat_input_message.name = "message";
-        chat_input_message.type = "text";
+        var chat_input_message = document.createElement("textarea");
+        chat_input_message.name = "chat_message";
         var chat_send_message = document.createElement("input");
         chat_send_message.value = "send";
         chat_send_message.type = "submit";
@@ -28,9 +27,10 @@
 
         _add_msg(msg);
         chat_form.onsubmit = function() {
-            var message = this.message.value;
+            var message = this.chat_message.value;
+            this.chat_message.value = "";
             var id = this.name;
-            message && socket.send(JSON.stringify({
+            message && chat_socket.send(JSON.stringify({
                 message: message,
                 id: id
             }));
@@ -38,11 +38,8 @@
         };
     }
 
-    // обработчик входящих сообщений
-    socket.onmessage = function(event) {
+    chat_socket.onmessage = function(event) {
         var msg = JSON.parse(event.data);
-        console.log('@>111', msg);
-        console.log('@>111', document.getElementById(msg.id));
 
         if (document.getElementById(msg.id)) {
             _add_msg(msg);
@@ -51,12 +48,10 @@
         }
 
         if (msg && msg.message === "/close" && document.getElementsByName(msg.id)[0]) {
-            console.log('@>del')
             document.getElementsByName(msg.id)[0].remove();
         }
     };
 
-    // показать сообщение в div#subscribe
     function _add_msg(msg) {
         var messageElem = document.createElement('div');
         let message_text = (msg.is_admin ? "you" : msg.id) + " : " + msg.message;
@@ -64,6 +59,14 @@
         document.getElementById(msg.id).appendChild(messageElem);
     }
     </script>
+    <style>
+    form {
+        display: inline-block;
+        width: 20%;
+        min-width: 250px;
+        font-size: 12px;
+    }
+    </style>
 </body>
 
 </html>

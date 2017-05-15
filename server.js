@@ -42,7 +42,7 @@ webSocketServer.on('connection', function(ws) {
 
     !is_admin ? clients[id] = ws : 1;
 
-    console.log("новое соединение ", id, is_admin);
+    console.log("new connect: ", id, is_admin);
 
     ws.on('message', function(msg) {
 
@@ -58,7 +58,7 @@ webSocketServer.on('connection', function(ws) {
 
         client && client.send(JSON.stringify({
             id: msg.id ? "support" : id,
-            message: msg.message
+            message: clients["support"] ? msg.message : `(support is offline) ${msg.message}`
         }));
 
 
@@ -72,7 +72,7 @@ webSocketServer.on('connection', function(ws) {
     });
 
     ws.on('close', function() {
-        console.log('соединение закрыто ' + id);
+        console.log('connection was closed ' + id);
 
         if (!is_admin && clients["support"]) {
             clients["support"].send(JSON.stringify({
