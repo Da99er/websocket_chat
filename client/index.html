@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Document</title>
+    <title>Client</title>
 </head>
 
 <body>
@@ -57,7 +57,6 @@
     <style>
     .chart_form {
         background: inherit;
-        background: inherit;
         font-family: Arial, sans-serif;
         transition: 0.2s ease-in;
         position: fixed;
@@ -76,7 +75,7 @@
         width: 100%;
         border: 0;
         font-size: 19px;
-        padding: 8px;
+        padding: 10px;
         cursor: pointer;
         color: #fff;
     }
@@ -94,10 +93,15 @@
         border: 0;
         margin: 0;
         border-radius: initial !important;
+        resize: none;
+        height: 30px;
+        overflow-y: auto;
+        font-size: 14px;
     }
     
-    .chat_message:hover {
-        border: 0;
+    .chat_message:hover,
+    .chat_message:focus {
+        border: 0 !important;
     }
     
     .chat_send_button {
@@ -106,7 +110,8 @@
         display: block;
         padding: 8px;
         font-size: 19px;
-        background-color: inherit;
+        background-color: #2196f3;
+        border-radius: 0 !important;
         color: #fff;
     }
     </style>
