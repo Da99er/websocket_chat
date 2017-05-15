@@ -13,7 +13,7 @@
             you was connected to support
         </div>
         <textarea name="chat_message" class="chat_message"></textarea>
-        <input type="submit" value="Send" class="chat_send_button">
+        <input type="submit" value="SEND" class="chat_send_button">
     </form>
     <script>
     var chat_socket;
@@ -57,54 +57,58 @@
     </script>
     <style>
     .chart_form {
+        background: inherit;
+        background: inherit;
         font-family: Arial, sans-serif;
         transition: 0.2s ease-in;
-        background-color: #afa;
         position: fixed;
         bottom: 0;
-        left: 2%;
-        width: 350px;
-        height: 100px;
-        padding: 16px;
+        left: 1%;
+        width: 340px;
+        height: 36px;
     }
     
     .chart_form.active_chart {
-        height: 300px;
+        height: 306px;
     }
     
     .switch_chat_button {
+        background: inherit;
         width: 100%;
         border: 0;
-        background-color: #00f;
         font-size: 19px;
         padding: 8px;
         cursor: pointer;
+        color: #fff;
     }
     
     .chat_subscribe {
-        padding: 12px 0;
-        background-color: #fff;
-        text-indent: 10px;
-        margin: 10px 0;
-        height: 130px;
+        background-color: #ccc;
+        height: 180px;
         overflow-y: scroll;
         font-size: 14px;
+        padding: 10px;
     }
     
     .chat_message {
-        width: 100%;
+        padding: 10px;
         border: 0;
-        padding: 0;
+        margin: 0;
+        border-radius: initial !important;
+    }
+    
+    .chat_message:hover {
+        border: 0;
     }
     
     .chat_send_button {
         width: 100%;
         border: 0;
-        margin: 12px 0 0;
         display: block;
         padding: 8px;
         font-size: 19px;
-        background-color: #00f;
+        background-color: inherit;
+        color: #fff;
     }
     </style>
 </body>
