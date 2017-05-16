@@ -6,20 +6,20 @@
     <title>Support</title>
 </head>
 
-<body >
+<body>
     <script>
     var chat_socket = new WebSocket("ws://127.0.0.1:8087", "test123");
 
     function _creat_chat_template(msg) {
         var chat_form = document.createElement("form");
-        chat_form.name = msg.id;
+        chat_form.name = msg.chat_id;
         var chat_input_message = document.createElement("textarea");
         chat_input_message.name = "chat_message";
         var chat_send_message = document.createElement("input");
         chat_send_message.value = "send";
         chat_send_message.type = "submit";
         var chat_conersation = document.createElement("div");
-        chat_conersation.id = msg.id;
+        chat_conersation.id = msg.chat_id;
         chat_form.appendChild(chat_conersation);
         chat_form.appendChild(chat_input_message);
         chat_form.appendChild(chat_send_message);
@@ -29,10 +29,11 @@
         chat_form.onsubmit = function() {
             var message = this.chat_message.value;
             this.chat_message.value = "";
-            var id = this.name;
+            console.log('@>onsubmit', this, this.name)
+            var chat_id = this.name;
             message && chat_socket.send(JSON.stringify({
                 message: message,
-                id: id
+                id: chat_id
             }));
             return false;
         };
@@ -41,22 +42,59 @@
     chat_socket.onmessage = function(event) {
         var msg = JSON.parse(event.data);
 
-        if (document.getElementById(msg.id)) {
-            _add_msg(msg);
-        } else {
-            _creat_chat_template(msg);
+        console.log('@>', msg)
+
+        switch (msg.type) {
+            case "clients":
+                if (!document.getElementById("user_sector")) {
+                    let acc_div = document.createElement('div');
+                    acc_div.id = "user_sector";
+                    let user_name_text = "you are: " + msg.id;
+                    acc_div.appendChild(document.createTextNode(user_name_text));
+                    document.body.appendChild(acc_div);
+                }
+
+                msg.message.map(e => {
+                    if (!document.getElementById(e)) {
+                        _creat_chat_template({
+                            chat_id: e,
+                            message: "chat with: " + e,
+                            id: e
+                        });
+                    }
+                });
+                break;
+            case "to_client":
+                if (document.getElementById(msg.chat_id)) {
+                    _add_msg(msg);
+                } else {
+                    _creat_chat_template(msg);
+                }
+                break;
+            case "to_support":
+                if (document.getElementById(msg.chat_id)) {
+                    _add_msg(msg);
+                } else {
+                    _creat_chat_template(msg);
+                }
+                break;
+            default:
+                break;
         }
 
-        if (msg && msg.message === "/close" && document.getElementsByName(msg.id)[0]) {
-            document.getElementsByName(msg.id)[0].remove();
-        }
+
+
+        /*if (msg && msg.message === "/close" && document.getElementsByName(msg.chat_id)[0]) {
+            document.getElementsByName(msg.chat_id)[0].remove();
+        }*/
     };
 
     function _add_msg(msg) {
+        console.log('@>', msg)
         var messageElem = document.createElement('div');
-        let message_text = (msg.is_admin ? "you" : msg.id) + " : " + msg.message;
+        let message_text = msg.id + " : " + msg.message;
         messageElem.appendChild(document.createTextNode(message_text));
-        document.getElementById(msg.id).appendChild(messageElem);
+        document.getElementById(msg.chat_id).appendChild(messageElem);
     }
     </script>
     <style>

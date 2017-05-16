@@ -42,14 +42,14 @@
         message && chat_socket.send(JSON.stringify({
             message: message
         }));
+
         return false;
     };
 
-
-
     function showMessage(message) {
         var messageElem = document.createElement('div');
-        let author = message.id !== "support" ? "you" : "support";
+        //let author = message.id !== "support" ? "you" : "support";
+        let author = message.id;
         messageElem.appendChild(document.createTextNode(author + " : " + message.message));
         document.getElementById('chat_subscribe').appendChild(messageElem);
     }

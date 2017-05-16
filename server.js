@@ -1,7 +1,6 @@
 const path = require("path");
 const static = require('node-static');
 
-
 let file = new static.Server(__dirname);
 
 let PORT_SOCKET = process.argv[2];
@@ -18,6 +17,7 @@ if (PORT_STATIC) {
 let WebSocketServer = new require('ws');
 
 let clients = {}; // all web socket clients
+let supports = {}; // all web socket supports
 
 var webSocketServer = new WebSocketServer.Server({
     port: PORT_SOCKET
@@ -28,7 +28,6 @@ let { ADMIN_ID } = require(path.join(__dirname, "cfg"));
 webSocketServer.on('connection', function(ws) {
 
     let id = Date.now();
-    let is_admin = false;
 
     try {
         id += ws.upgradeReq.headers.cookie.match(/currentAccount=([a-z,0-9,-]+)/g)[0];
@@ -37,17 +36,19 @@ webSocketServer.on('connection', function(ws) {
     }
 
     try {
-        if (ws.upgradeReq.headers["sec-websocket-protocol"] == ADMIN_ID) {
-            clients["support"] = ws;
-            is_admin = true;
+        if (~ws.upgradeReq.headers["sec-websocket-protocol"].indexOf(ADMIN_ID)) {
+            id += "support"
+            supports[id] = ws;
         }
     } catch (err) {
-        console.log('@>err protocol')
+        console.log('@>err protocol not support')
     }
 
-    !is_admin ? clients[id] = ws : 1;
+    if (id.indexOf("support") == -1) {
+        clients[id] = ws
+    }
 
-    console.log("new connect: ", id, is_admin);
+    console.log("new connect: ", id);
 
     ws.on('message', function(msg) {
 
@@ -57,40 +58,64 @@ webSocketServer.on('connection', function(ws) {
             msg: '{"message":error}'
         }
 
-        console.log('@>message', msg, id, is_admin)
+        let send_id = msg.id || id;
 
-        let client = clients[msg.id || id];
+        console.log('@>message', msg, id)
 
-        client && client.send(JSON.stringify({
-            id: msg.id ? "support" : id,
-            message: clients["support"] ? msg.message : `(support is offline) ${msg.message}`
-        }));
-
-
-        clients["support"] && clients["support"].send(JSON.stringify({
-            id: msg.id || id,
+        clients[send_id] && clients[send_id].send(JSON.stringify({
+            id: id,
             message: msg.message,
-            is_admin: msg.id
+            type: "to_client"
         }));
 
+        for (let i in supports) {
+            supports[i].send(JSON.stringify({
+                chat_id: send_id,
+                message: msg.message,
+                id: id,
+                type: "to_support"
+            }));
+        }
 
     });
 
     ws.on('close', function() {
         console.log('connection was closed ' + id);
 
-        if (!is_admin && clients["support"]) {
-            clients["support"].send(JSON.stringify({
+        for (let i in supports) {
+            if (supports[i].readyState === supports[i].OPEN) {
+                supports[i].send(JSON.stringify({
+                    id,
+                    message: "/close"
+                }));
+            }
+        }
+
+        if (id.indexOf("support") == -1 && clients[id] && clients[id].readyState === clients[id].OPEN) {
+            clients[id].send(JSON.stringify({
                 id,
                 message: "/close"
             }));
+            delete clients[id];
+        } else {
+            delete supports[id];
         }
-
-        delete clients[id];
     });
 
     ws.on('error', function(err) {
         console.log(err);
     });
+
+
+    for (let i in supports) {
+        supports[i].send(JSON.stringify({
+            message: Object.keys(clients),
+            id: id,
+            type: "clients"
+        }));
+    }
+
+    console.log('@>clients', Object.keys(clients));
+    console.log('@>supports', Object.keys(supports));
 
 });
