@@ -27,7 +27,7 @@ let { ADMIN_ID } = require(path.join(__dirname, "cfg"));
 
 webSocketServer.on('connection', function(ws) {
 
-    let id = Date.now();
+    let id = Date.now() + "";
 
     try {
         id += ws.upgradeReq.headers.cookie.match(/currentAccount=([a-z,0-9,-]+)/g)[0];
@@ -45,7 +45,13 @@ webSocketServer.on('connection', function(ws) {
     }
 
     if (id.indexOf("support") == -1) {
-        clients[id] = ws
+        clients[id] = ws;
+        ws.send(JSON.stringify({
+            id: id,
+            message: "you was connected to support",
+            supports: Object.keys(supports).length,
+            type: "to_client"
+        }));
     }
 
     console.log("new connect: ", id);
@@ -60,18 +66,23 @@ webSocketServer.on('connection', function(ws) {
 
         let send_id = msg.id || id;
 
-        console.log('@>message', msg, id)
+        console.log('@>message', msg, id);
 
-        clients[send_id] && clients[send_id].send(JSON.stringify({
-            id: id,
-            message: msg.message,
-            type: "to_client"
-        }));
+
+        if (clients[send_id] && clients[send_id].readyState === clients[send_id].OPEN) {
+            clients[send_id].send(JSON.stringify({
+                id: id,
+                message: msg.message,
+                supports: Object.keys(supports),
+                type: "to_client"
+            }));
+        }
 
         for (let i in supports) {
             supports[i].send(JSON.stringify({
                 chat_id: send_id,
                 message: msg.message,
+                supports: Object.keys(supports),
                 id: id,
                 type: "to_support"
             }));
@@ -96,10 +107,10 @@ webSocketServer.on('connection', function(ws) {
                 id,
                 message: "/close"
             }));
-            delete clients[id];
-        } else {
-            delete supports[id];
         }
+
+        delete clients[id];
+        delete supports[id];
     });
 
     ws.on('error', function(err) {
@@ -109,13 +120,14 @@ webSocketServer.on('connection', function(ws) {
 
     for (let i in supports) {
         supports[i].send(JSON.stringify({
-            message: Object.keys(clients),
+            clients: Object.keys(clients),
+            supports: Object.keys(supports),
             id: id,
             type: "clients"
         }));
     }
 
-    console.log('@>clients', Object.keys(clients));
-    console.log('@>supports', Object.keys(supports));
+    console.log('@>clients', Object.keys(clients).length, Object.keys(clients));
+    console.log('@>supports', Object.keys(supports).length, Object.keys(supports));
 
 });

@@ -7,8 +7,22 @@
 </head>
 
 <body>
+    <div class="all_users">
+    </div>
     <script>
     var chat_socket = new WebSocket("ws://127.0.0.1:8087", "test123");
+
+    document.querySelector(".all_users").addEventListener("click", function(e) {
+        if (e && e.target && e.target.nodeName == "BUTTON") {
+            e.target.className = "";
+
+            Array.prototype.map.call(document.forms, function(e) {
+                e.style.display = "none";
+            });
+
+            document.getElementsByName(e.target.title)[0].style.display = "block";
+        }
+    });
 
     function _creat_chat_template(msg) {
         var chat_form = document.createElement("form");
@@ -29,7 +43,6 @@
         chat_form.onsubmit = function() {
             var message = this.chat_message.value;
             this.chat_message.value = "";
-            console.log('@>onsubmit', this, this.name)
             var chat_id = this.name;
             message && chat_socket.send(JSON.stringify({
                 message: message,
@@ -47,14 +60,17 @@
         switch (msg.type) {
             case "clients":
                 if (!document.getElementById("user_sector")) {
-                    let acc_div = document.createElement('div');
+                    var acc_div = document.createElement('div');
                     acc_div.id = "user_sector";
-                    let user_name_text = "you are: " + msg.id;
-                    acc_div.appendChild(document.createTextNode(user_name_text));
-                    document.body.appendChild(acc_div);
                 }
 
-                msg.message.map(e => {
+                var user_name_text = "you are: " + msg.id + "\r\n";
+                user_name_text += "supports online: " + msg.supports.length + "\r\n";
+                user_name_text += "clients online: " + msg.clients.length + "\r\n";
+                acc_div.appendChild(document.createTextNode(user_name_text));
+                document.body.appendChild(acc_div);
+
+                msg.clients.map(e => {
                     if (!document.getElementById(e)) {
                         _creat_chat_template({
                             chat_id: e,
@@ -64,6 +80,7 @@
                     }
                 });
                 break;
+
             case "to_client":
                 if (document.getElementById(msg.chat_id)) {
                     _add_msg(msg);
@@ -82,28 +99,60 @@
                 break;
         }
 
-
-
-        /*if (msg && msg.message === "/close" && document.getElementsByName(msg.chat_id)[0]) {
+        //_rm_user()
+        if (msg && msg.message === "/close" && document.getElementsByName(msg.chat_id)[0]) {
             document.getElementsByName(msg.chat_id)[0].remove();
-        }*/
+            document.querySelector('[title="' + msg.chat_id + '"]').remove();
+        }
     };
 
     function _add_msg(msg) {
-        console.log('@>', msg)
+        var user_tab_divs = document.querySelector(".all_users");
+
+
+        if (!document.querySelector('[title="' + msg.chat_id + '"]')) {
+            var tab_button = document.createElement("button");
+            tab_button.title = msg.chat_id;
+            tab_button.innerHTML = msg.chat_id;
+            tab_button.className = "active";
+            user_tab_divs.appendChild(tab_button)
+        } else {
+            var tab_button = document.querySelector('[title="' + msg.chat_id + '"]');
+            tab_button.className = "active";
+
+        }
+
         var messageElem = document.createElement('div');
-        let message_text = msg.id + " : " + msg.message;
+        var message_text = msg.id + " : " + msg.message;
         messageElem.appendChild(document.createTextNode(message_text));
         document.getElementById(msg.chat_id).appendChild(messageElem);
     }
     </script>
     <style>
     form {
-        display: inline-block;
-        width: 22%;
-        min-width: 250px;
+        display: block;
         font-size: 14px;
-        margin: 2%;
+        margin: 3% 0;
+    }
+    
+    .all_users {
+        border: 2px solid blue;
+        float: left;
+        width: 160px;
+        font-size: 10px;
+        min-height: 500px;
+    }
+    
+    .all_users button {
+        font-size: 10px;
+        word-break: break-all;
+        width: 100%;
+        padding: 6px 0px;
+    }
+    
+    .all_users button.active {
+        border: 2px solid #5bd8ff;
+        background: #9effff;
     }
     </style>
 </body>

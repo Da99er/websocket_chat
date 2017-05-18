@@ -9,8 +9,13 @@
 <body style="background: linear-gradient(to bottom, #f0f9ff 0%,#cbebff 47%,#a1dbff 100%)">
     <form name="chart_form" class="chart_form">
         <button id="switch_chat" class="switch_chat_button">Support</button>
+        <div id="chat_send_form" class="chat_send_form">
+            <p class="chat_send_form_offline">support is offline</p>
+            <p class="chat_send_form_offline" name="chat_warning_text">you can send your issue via this form</p>
+            <input type="email" name="chart_mail_email" placeholder="email" />
+            <textarea name="chart_mail_message"></textarea>
+        </div>
         <div id="chat_subscribe" class="chat_subscribe">
-            you was connected to support
         </div>
         <textarea name="chat_message" class="chat_message"></textarea>
         <input type="submit" value="SEND" class="chat_send_button">
@@ -20,38 +25,88 @@
 
     document.getElementById("switch_chat").addEventListener("click", function(e) {
         var form = document.getElementById("switch_chat").parentNode;
-        if (form.className === "chart_form") {
-            form.className = "chart_form active_chart"
+        e && e.target && e.target.id == "switch_chat" && e.preventDefault();
+
+        if (form.className.indexOf("active_chart") == -1) {
+            form.className += " active_chart";
             chat_socket = new WebSocket("ws://127.0.0.1:8087");
 
             chat_socket.onmessage = function(event) {
                 var incomingMessage = JSON.parse(event.data);
-                showMessage(incomingMessage);
+                if (incomingMessage.message == "/close") {
+                    incomingMessage.message = "support was disconnected";
+                    chat_socket.close();
+                }
+                if (~incomingMessage.id.indexOf("support")) {
+                    incomingMessage.id = "support";
+                } else {
+                    incomingMessage.id = "you";
+                }
+
+                if (!incomingMessage.supports) {
+                    form.className += " chat_offline";
+                }
+
+                _showMessage(incomingMessage);
             };
-        } else {
-            form.className = "chart_form";
+        } else if (~form.className.indexOf(" active_chart")) {
+            form.className = form.className.split(" active_chart").join("");
             chat_socket && chat_socket.close();
         }
+
     });
 
 
-    document.forms.chart_form.onsubmit = function() {
+    document.forms.chart_form.onsubmit = function(e) {
         var message = this.chat_message.value;
-        this.chat_message.value = "";
+        e.preventDefault();
+
+        if (~this.className.indexOf("chat_offline")) {
+            var chart_mail_email = this.chart_mail_email.value;
+            var chart_mail_message = this.chart_mail_message.value;
+
+            if (!chart_mail_email && !(/.+@.+\..+/i).test(chart_mail_email)) {
+                document.getElementsByName("chat_warning_text")[0].innerHTML = "please input email";
+            } else if (!chart_mail_message) {
+                document.getElementsByName("chat_warning_text")[0].innerHTML = "please input message";
+            }
+
+
+            console.log('@>', chart_mail_email);
+            console.log('@>', chart_mail_message);
+
+            _sendMessage({
+                email: chart_mail_email,
+                message: chart_mail_message
+            });
+        }
 
         message && chat_socket.send(JSON.stringify({
-            message: message
+            message: chat_message
         }));
 
+        this.chat_message.value = "";
         return false;
     };
 
-    function showMessage(message) {
+    function _showMessage(message) {
         var messageElem = document.createElement('div');
-        //let author = message.id !== "support" ? "you" : "support";
-        let author = message.id;
-        messageElem.appendChild(document.createTextNode(author + " : " + message.message));
+        messageElem.appendChild(document.createTextNode(message.id + " : " + message.message));
         document.getElementById('chat_subscribe').appendChild(messageElem);
+    }
+
+    function _sendMessage(msg) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'https://openledger.info/popupS_mail.php', true); // 'your api adress'
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset=utf-8');
+        xhr.onreadystatechange = function() {
+            if (this.readyState != 4) return;        
+            var message_text = "<p class='chat_send_form_offline'>Thanks</p>";
+            message_text += "<p class='chat_send_form_offline'>our support will be answer you later</p>";
+            document.getElementById('chat_send_form').innerHTML = message_text;
+        }
+        var message = 'popupS_email=' + msg.email + '&popupS_message=' + msg.message + '&popupS_subject=support';
+        xhr.send(message);
     }
     </script>
     <style>
@@ -117,6 +172,51 @@
         border-radius: 0 !important;
         color: #fff;
         cursor: pointer;
+    }
+    
+    .chat_send_form {
+        display: none;
+        width: 100%;
+        position: absolute;
+        z-index: 100;
+        height: 255px;
+        background: rgba(0, 0, 0, 0.8);
+    }
+    
+    .chat_offline .chat_send_form {
+        display: block;
+    }
+    /*.chat_send_form {
+        display: none;
+    }*/
+    
+    .chat_send_form input[type="email"],
+    .chat_send_form input[type="text"] {
+        display: block;
+        margin: 0 auto;
+        width: 80%;
+        border: 0 !important;
+        font-size: 14px;
+        padding: 5px 0px;
+        text-indent: 8px;
+    }
+    
+    .chat_send_form .chat_send_form_offline {
+        margin: 0;
+        color: #fff;
+        padding: 10px 0;
+        text-align: center;
+    }
+    
+    .chat_send_form textarea {
+        display: block;
+        resize: none;
+        margin: 26px auto 0;
+        width: 76%;
+        padding: 2%;
+        border: 0 !important;
+        height: 92px;
+        text-align: left;
     }
     </style>
 </body>
