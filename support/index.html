@@ -59,15 +59,18 @@
 
         switch (msg.type) {
             case "clients":
+                var acc_div;
                 if (!document.getElementById("user_sector")) {
-                    var acc_div = document.createElement('div');
+                    acc_div = document.createElement('div');
                     acc_div.id = "user_sector";
+                } else {
+                    acc_div = document.getElementById("user_sector");
                 }
 
                 var user_name_text = "you are: " + msg.id + "\r\n";
                 user_name_text += "supports online: " + msg.supports.length + "\r\n";
                 user_name_text += "clients online: " + msg.clients.length + "\r\n";
-                acc_div.appendChild(document.createTextNode(user_name_text));
+                acc_div.innerHTML = user_name_text;
                 document.body.appendChild(acc_div);
 
                 msg.clients.map(e => {
