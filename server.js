@@ -111,6 +111,15 @@ webSocketServer.on('connection', function(ws) {
 
         delete clients[id];
         delete supports[id];
+
+        for (let i in supports) {
+            supports[i].send(JSON.stringify({
+                clients: Object.keys(clients),
+                supports: Object.keys(supports),
+                id: id,
+                type: "clients"
+            }));
+        }
     });
 
     ws.on('error', function(err) {

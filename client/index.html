@@ -67,13 +67,11 @@
 
             if (!chart_mail_email && !(/.+@.+\..+/i).test(chart_mail_email)) {
                 document.getElementsByName("chat_warning_text")[0].innerHTML = "please input email";
+                return;
             } else if (!chart_mail_message) {
                 document.getElementsByName("chat_warning_text")[0].innerHTML = "please input message";
+                return;
             }
-
-
-            console.log('@>', chart_mail_email);
-            console.log('@>', chart_mail_message);
 
             _sendMessage({
                 email: chart_mail_email,
