@@ -58,7 +58,7 @@
 
 
     document.forms.chart_form.onsubmit = function(e) {
-        var message = this.chat_message.value;
+        var chat_message = this.chat_message.value;
         e.preventDefault();
 
         if (~this.className.indexOf("chat_offline")) {
@@ -81,7 +81,7 @@
             });
         }
 
-        message && chat_socket.send(JSON.stringify({
+        chat_message && chat_socket.send(JSON.stringify({
             message: chat_message
         }));
 
@@ -100,7 +100,7 @@
         xhr.open('POST', 'https://openledger.info/popupS_mail.php', true); // 'your api adress'
         xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset=utf-8');
         xhr.onreadystatechange = function() {
-            if (this.readyState != 4) return;        
+            if (this.readyState != 4) return;
             var message_text = "<p class='chat_send_form_offline'>Thanks</p>";
             message_text += "<p class='chat_send_form_offline'>our support will be answer you later</p>";
             document.getElementById('chat_send_form').innerHTML = message_text;
@@ -199,6 +199,7 @@
         font-size: 14px;
         padding: 5px 0px;
         text-indent: 8px;
+        height: 16px;
     }
     
     .chat_send_form .chat_send_form_offline {
@@ -215,7 +216,7 @@
         width: 76%;
         padding: 2%;
         border: 0 !important;
-        height: 92px;
+        height: 80px;
         text-align: left;
     }
     </style>
