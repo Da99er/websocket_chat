@@ -29,7 +29,7 @@
 
         if (form.className.indexOf("active_chart") == -1) {
             form.className += " active_chart";
-            chat_socket = new WebSocket("ws://127.0.0.1:8087");
+            chat_socket = new WebSocket("ws://127.0.0.1:8087"); //needchange
 
             chat_socket.onmessage = function(event) {
                 var incomingMessage = JSON.parse(event.data);
@@ -95,7 +95,7 @@
 
     function _sendMessage(msg) {
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', 'https://openledger.info/popupS_mail.php', true); // 'your api adress'
+        xhr.open('POST', '/', true); // 'needchange'
         xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset=utf-8');
         xhr.onreadystatechange = function() {
             if (this.readyState != 4) return;
