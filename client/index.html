@@ -103,7 +103,7 @@
             message_text += "<p class='chat_send_form_offline'>our support will be answer you later</p>";
             document.getElementById('chat_send_form').innerHTML = message_text;
         }
-        var message = 'popupS_email=' + msg.email + '&popupS_message=' + msg.message + '&popupS_subject=support';
+        var message = 'email=' + msg.email + '&message=' + msg.message + '&subject=support'+ '&website=' + location.host;
         xhr.send(message);
     }
     </script>
